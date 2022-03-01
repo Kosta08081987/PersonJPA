@@ -3,10 +3,10 @@ package telran.java40.person.model;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-import javax.persistence.Embedded;
-import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -22,8 +22,9 @@ import lombok.Setter;
 @Setter
 @Builder
 @EqualsAndHashCode(of = {"id"})
-@Entity
-@Table(name = "persons")
+@Entity//(name = "Persons") for JPQL query
+@Table(name = "persons")// name of table in database
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Person implements Serializable{
 
 	/**

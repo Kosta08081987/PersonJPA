@@ -9,9 +9,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import telran.java40.person.dao.PersonRepository;
+import telran.java40.person.dto.ChildDto;
+import telran.java40.person.dto.CityPopulationDto;
+import telran.java40.person.dto.EmployeeDto;
+import telran.java40.person.dto.EntityDto;
 import telran.java40.person.dto.PersonDto;
 import telran.java40.person.exceptions.PersonNotFoundException;
 import telran.java40.person.model.Address;
+import telran.java40.person.model.Child;
+import telran.java40.person.model.Employee;
+import telran.java40.person.model.Entity;
 import telran.java40.person.model.Person;
 
 @Service
@@ -27,17 +34,25 @@ public class PersonServiceImpl implements PersonService {
 	}
 
 	@Override
-	public boolean addPerson(PersonDto personDto) {
-		if (personRepository.existsById(personDto.getId())) {
+	@Transactional
+	public boolean addPerson(EntityDto entityDto) {
+		if (personRepository.existsById(entityDto.getId())) {
 			return false;
 		}
-		personRepository.save(modelMapper.map(personDto, Person.class));
+		if("person".equalsIgnoreCase(entityDto.getType())) {
+			personRepository.save(modelMapper.map(entityDto, Person.class));
+		}else if("child".equalsIgnoreCase(entityDto.getType())) {
+			personRepository.save(modelMapper.map(entityDto, Child.class));
+		}else if("employee".equalsIgnoreCase(entityDto.getType())) {
+			personRepository.save(modelMapper.map(entityDto, Employee.class));
+		}
 		return true;
 	}
 
 	@Override
 	public PersonDto findPerson(Integer id) {
 		Person person = personRepository.findById(id).orElseThrow(() -> new PersonNotFoundException(id));
+		
 		return modelMapper.map(person, PersonDto.class);
 	}
 
@@ -90,6 +105,21 @@ public class PersonServiceImpl implements PersonService {
 		return modelMapper.map(person, PersonDto.class);
 	}
 
-	
+	@Override
+	public Iterable<CityPopulationDto> getCityPopulation() {
+		return personRepository.getCityPopulation();
+	}
+
+	@Override
+	@Transactional
+	public Iterable<PersonDto> findEmployeeBySalary(int min, int max) {
+		return personRepository.findBySalaryBetween(min, max).map(e -> modelMapper.map(e, EmployeeDto.class)).collect(Collectors.toList());
+	}
+
+	@Override
+	@Transactional
+	public Iterable<PersonDto> getChildren() {
+		return personRepository.findBy().map(e -> modelMapper.map(e, ChildDto.class)).collect(Collectors.toList());
+	}
 
 }

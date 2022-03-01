@@ -8,14 +8,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import telran.java40.person.dto.CityPopulationDto;
+import telran.java40.person.dto.EntityDto;
 import telran.java40.person.dto.PersonDto;
 import telran.java40.person.model.Address;
 import telran.java40.person.service.PersonService;
 
-@RestController()
+@RestController
 @RequestMapping("/person")
 public class PersonController {
 	
@@ -27,8 +28,9 @@ public class PersonController {
 	}
 	
 	@PostMapping
-	public boolean addPerson(@RequestBody PersonDto personDto) {
-		return personService.addPerson(personDto);
+	public boolean addPerson(@RequestBody /* @Valid */ EntityDto entityDto) {
+		System.out.println(entityDto);
+		return personService.addPerson(entityDto);
 	}
 	
 	@GetMapping("/{id}")
@@ -69,6 +71,21 @@ public class PersonController {
 	@DeleteMapping("/{id}")
 	PersonDto deletePerson(@PathVariable Integer id) {
 		return personService.deletePerson(id);
+	}
+	
+	@GetMapping("/population/city")
+	public Iterable<CityPopulationDto> getCityPopulation() {
+		return personService.getCityPopulation();
+	}
+	
+	@GetMapping("/employee/salary/{min}/{max}")
+	public Iterable<PersonDto> findEmployeeBySalary(@PathVariable int min,@PathVariable int max) {
+		return personService.findEmployeeBySalary(min, max);
+	}
+	
+	@GetMapping("/children")
+	public Iterable<PersonDto> getChildren() {
+		return personService.getChildren();
 	}
 
 }
